@@ -47,7 +47,7 @@ def rate_limited_password_reset(request):
         form = PasswordResetForm(request.POST)
         if form.is_valid():
             form.save(request=request)
-            cache.set(key, attempts + 1, timeout=3600)  # 1 hour
+            cache.set(key, attempts + 1, timeout=3600) 
             return redirect('password_reset_done')
     else:
         form = PasswordResetForm()
