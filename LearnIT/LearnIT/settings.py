@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'axes'
 ]
 
 REST_FRAMEWORK = {
@@ -55,6 +56,12 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'turno.ithranbeor7@gmail.com'
 EMAIL_HOST_PASSWORD = 'pvdfrqdvsfuozlol'
 
+AXES_FAILURE_LIMIT = 3
+AXES_COOLOFF_TIME = 15  # minutes
+AXES_ONLY_USER_FAILURES = False
+AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True
+AXES_RESET_ON_SUCCESS = True
+
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
@@ -69,6 +76,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 

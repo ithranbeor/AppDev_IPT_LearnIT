@@ -6,7 +6,7 @@ from .views import VideoList
 from .views import LoginView
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import ProfileAPIView, ProfileUpdateView, SignupView, UserUploadedVideosAPIView, CommentDeleteView, logout_view, LogoutTimeView
+from .views import ProfileAPIView, ProfileUpdateView, SignupView, UserUploadedVideosAPIView, CommentDeleteView, logout_view, LogoutTimeView, rate_limited_password_reset
 
 urlpatterns = [
     
@@ -56,7 +56,7 @@ urlpatterns = [
     path('search-signin-history/', views.search_signin_history, name='search_signin_history'),
     path('delete-signin/<int:activity_id>/', views.delete_signin_activity, name='delete_signin_activity'),
     path('terms/', views.terms, name='terms'),
-    path('password-reset/', auth_views.PasswordResetView.as_view(template_name='password_reset_form.html'), name='password_reset'),
+    path("accounts/password_reset/", rate_limited_password_reset, name="password_reset"),
     path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),

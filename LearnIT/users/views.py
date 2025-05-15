@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.core.cache import cache
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test, login_required
 from django.contrib.auth.signals import user_logged_out
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.forms import PasswordResetForm
 from django.views.decorators.cache import never_cache
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -31,6 +33,32 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied
+
+def rate_limited_password_reset(request):
+    ip = get_client_ip(request)
+    key = f'password_reset_attempts_{ip}'
+    attempts = cache.get(key, 0)
+
+    if attempts >= 5:
+        messages.error(request, "Too many reset attempts. Please try again later.")
+        return render(request, 'password_reset_form.html')
+
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            form.save(request=request)
+            cache.set(key, attempts + 1, timeout=3600)  # 1 hour
+            return redirect('password_reset_done')
+    else:
+        form = PasswordResetForm()
+
+    return render(request, 'password_reset_form.html', {'form': form})
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[0]
+    return request.META.get('REMOTE_ADDR')
 
 def terms(request):
     return render(request, 'terms.html')
